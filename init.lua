@@ -96,6 +96,21 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+-- Manually Fix the Line Endings in the Problematic File
+-- Before triggering Prettier or ESLint, manually fix the file’s line endings:
+--
+-- Open the problematic file in Neovim.
+--
+-- Run the following command:
+--
+-- vim
+-- Copy
+-- Edit
+-- :e ++ff=unix | w
+-- This converts the file to LF line endings and saves it.
+--
+-- Then re-run your code action or formatting.
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -179,6 +194,8 @@ vim.opt.scrolloff = 10
 vim.opt.hlsearch = true
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
+vim.api.nvim_set_keymap('n', '<leader>ft', ':e ++ff=unix | w<CR>', { noremap = true, silent = true })
+
 -- Diagnostic keymaps
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous [D]iagnostic message' })
 vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagnostic message' })
@@ -260,6 +277,13 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+
+-- vim.api.nvim_create_autocmd('BufWritePre', {
+--   callback = function()
+--     print('File format: ' .. vim.bo.fileformat)
+--     print('Line endings: ' .. vim.inspect(vim.opt.fileformats:get()))
+--   end,
+-- })
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
@@ -673,6 +697,34 @@ require('lazy').setup({
       }
     end,
   },
+  {
+    'jose-elias-alvarez/null-ls.nvim',
+    requires = 'nvim-lua/plenary.nvim',
+    lazy = false,
+    opts = function()
+      local null_ls = require 'null-ls'
+
+      return {
+        sources = {
+          -- Prettier for formatting
+          null_ls.builtins.formatting.prettierd.with {
+            filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
+            exta_args = { '--end-of-line', 'lf' },
+          },
+
+          -- ESLint for diagnostics (linting)
+          null_ls.builtins.diagnostics.eslint_d.with {
+            condition = function(utils)
+              return utils.root_has_file { '.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml' }
+            end,
+          },
+
+          -- ESLint for code actions (e.g., fixing issues)
+          null_ls.builtins.code_actions.eslint_d,
+        },
+      }
+    end,
+  },
 
   { -- Autoformat
     'stevearc/conform.nvim',
@@ -702,22 +754,25 @@ require('lazy').setup({
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
-      formatters_by_ft = {
-        lua = { 'stylua' },
-        -- Conform can also run multiple formatters sequentially
-        -- python = { "isort", "black" },
-        --
-        -- You can use a sub-list to tell conform to run *until* a formatter
-        -- is found.
-        javascript = {
-          {
-            'prettierd',
-            'prettier',
-            args = { '--tab-width', '4' }, -- Default to 4 spaces if no .prettierrc is found
-          },
-        },
-        -- javascript = { { "prettierd", "prettier" } },
-      },
+      -- formatters_by_ft = {
+      --   lua = { 'stylua' },
+      --   -- Conform can also run multiple formatters sequentially
+      --   -- python = { "isort", "black" },
+      --   --
+      --   -- You can use a sub-list to tell conform to run *until* a formatter
+      --   -- is found.
+      --   javascript = {
+      --     {
+      --       'prettierd',
+      --       'prettier',
+      --       args = { '--tab-width', '4' }, -- Default to 4 spaces if no .prettierrc is found
+      --     },
+      --   },
+      --   typescript = { 'prettierd', 'prettier' },
+      --   tsx = { 'eslint_d', 'prettierd', 'prettier' },
+      --   jsx = { 'eslint_d', 'prettierd', 'prettier' },
+      --   -- javascript = { { "prettierd", "prettier" } },
+      -- },
     },
   },
 

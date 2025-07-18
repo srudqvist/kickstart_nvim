@@ -203,9 +203,9 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagn
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Window management
-vim.keymap.set('n', '<leader>sv', '<C-w>v') -- split window vertically
-vim.keymap.set('n', '<leader>sb', '<C-w>s') -- split window horizontally
-vim.keymap.set('n', '<leader>se', '<C-w>=') -- make split windows equal width
+vim.keymap.set('n', '<leader>sv', '<C-w>v')     -- split window vertically
+vim.keymap.set('n', '<leader>sb', '<C-w>s')     -- split window horizontally
+vim.keymap.set('n', '<leader>se', '<C-w>=')     -- make split windows equal width
 vim.keymap.set('n', '<leader>sx', ':close<CR>') -- close current split window
 
 -- Explore
@@ -249,19 +249,31 @@ local function setup_autocmds()
   vim.cmd [[autocmd!]] -- Clear existing autocmds to avoid duplication
 
   -- Remove background colors
-  -- vim.api.nvim_create_augroup('nobg', { clear = true })
-  -- vim.api.nvim_create_autocmd({ 'ColorScheme' }, {
-  --   desc = 'Make all backgrounds transparent',
-  --   group = 'nobg',
-  --   pattern = '*',
-  --   callback = function()
-  --     vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE', ctermbg = 'NONE' })
-  --     vim.api.nvim_set_hl(0, 'NeoTreeNormal', { bg = 'NONE', ctermbg = 'NONE' })
-  --     vim.api.nvim_set_hl(0, 'NeoTreeNormalNC', { bg = 'NONE', ctermbg = 'NONE' })
-  --     vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE', ctermbg = 'NONE' })
-  --     -- etc...
-  --   end,
-  -- })
+  vim.api.nvim_create_augroup('nobg', { clear = true })
+  vim.api.nvim_create_autocmd({ 'ColorScheme' }, {
+    desc = 'Make all backgrounds transparent',
+    group = 'nobg',
+    pattern = '*',
+    callback = function()
+      -- vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'NeoTreeNormal', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'NeoTreeNormalNC', { bg = 'NONE', ctermbg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE', ctermbg = 'NONE' })
+
+      vim.api.nvim_set_hl(0, 'CursorLine', { bg = 'NONE', ctermbg = 'NONE' })
+      -- Telescope
+      -- vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'TelescopeBorder', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'TelescopePromptNormal', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'TelescopePromptBorder', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'TelescopeResultsNormal', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'TelescopeResultsBorder', { bg = 'NONE', ctermbg = 'NONE' })
+
+
+      -- etc...
+    end,
+  })
 end
 
 -- Call setup_autocmds function to set up the autocmds
@@ -319,7 +331,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',    opts = {} },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -354,7 +366,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  { -- Useful plugin to show you pending keybinds.
+  {                     -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -407,7 +419,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -708,7 +720,8 @@ require('lazy').setup({
         sources = {
           -- Prettier for formatting
           null_ls.builtins.formatting.prettierd.with {
-            filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
+            filetypes = { 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
+            -- filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
             exta_args = { '--end-of-line', 'lf' },
           },
 
@@ -946,6 +959,11 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       --  vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'nightfly'
+      require('rose-pine').setup({
+        disable_background = true,
+        disable_float_background = true,
+        disable_italics = false, -- optional
+      })
       vim.cmd.colorscheme 'rose-pine'
       -- vim.cmd.colorscheme 'habamax'
 

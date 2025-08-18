@@ -275,9 +275,9 @@ local function setup_autocmds()
     end,
   })
 end
-
 -- Call setup_autocmds function to set up the autocmds
 setup_autocmds()
+
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -373,19 +373,31 @@ require('lazy').setup({
       require('which-key').setup()
 
       -- Document existing key chains
-      require('which-key').register {
-        ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
-        ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
-        ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
-        ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
-        ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
-        ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
-        ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      -- require('which-key').register {
+      --   ['<leader>c'] = { name = '[C]ode', _ = 'which_key_ignore' },
+      --   ['<leader>d'] = { name = '[D]ocument', _ = 'which_key_ignore' },
+      --   ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' },
+      --   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
+      --   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+      --   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
+      --   ['<leader>h'] = { name = 'Git [H]unk', _ = 'which_key_ignore' },
+      -- }
+
+      require('which-key').add {
+        { "<leader>c", group = "[C]ode" },
+        { "<leader>d", group = "[D]ocument" },
+        { "<leader>r", group = "[R]ename" },
+        { "<leader>s", group = "[S]earch" },
+        { "<leader>w", group = "[W]orkspace" },
+        { "<leader>t", group = "[T]oggle" },
+        { "<leader>h", group = "Git [H]unk" },
+        -- Visual mode mapping
+        { "<leader>h", group = "Git [H]unk", mode = "v" },
       }
-      -- visual mode
-      require('which-key').register({
-        ['<leader>h'] = { 'Git [H]unk' },
-      }, { mode = 'v' })
+      -- -- visual mode
+      -- require('which-key').register({
+      --   ['<leader>h'] = { 'Git [H]unk' },
+      -- }, { mode = 'v' })
     end,
   },
 
@@ -657,8 +669,8 @@ require('lazy').setup({
         -- Some languages (like typescript) have entire language plugins that can be useful:
         --    https://github.com/pmizio/typescript-tools.nvim
         --
-        -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        -- But for many setups, the LSP (`ts_ls`) will work just fine
+        ts_ls = {},
         cssls = {},
         html = {},
         --
@@ -710,7 +722,8 @@ require('lazy').setup({
     end,
   },
   {
-    'jose-elias-alvarez/null-ls.nvim',
+    -- 'jose-elias-alvarez/null-ls.nvim',
+    'nvimtools/none-ls.nvim',
     requires = 'nvim-lua/plenary.nvim',
     lazy = false,
     opts = function()
@@ -722,18 +735,18 @@ require('lazy').setup({
           null_ls.builtins.formatting.prettierd.with {
             filetypes = { 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
             -- filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
-            exta_args = { '--end-of-line', 'lf' },
+            extra_args = { '--end-of-line', 'lf' },
           },
 
           -- ESLint for diagnostics (linting)
-          null_ls.builtins.diagnostics.eslint_d.with {
-            condition = function(utils)
-              return utils.root_has_file { '.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml' }
-            end,
-          },
+          -- null_ls.builtins.diagnostics.eslint_d.with {
+          --   condition = function(utils)
+          --     return utils.root_has_file { '.eslintrc', '.eslintrc.js', '.eslintrc.json', '.eslintrc.yml' }
+          --   end,
+          -- },
 
           -- ESLint for code actions (e.g., fixing issues)
-          null_ls.builtins.code_actions.eslint_d,
+          -- null_ls.builtins.code_actions.eslint_d,
         },
       }
     end,

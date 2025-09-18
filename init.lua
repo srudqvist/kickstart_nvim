@@ -733,7 +733,8 @@ require('lazy').setup({
         sources = {
           -- Prettier for formatting
           null_ls.builtins.formatting.prettierd.with {
-            filetypes = { 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
+            filetypes = { 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'json', 'yaml', 'markdown' },
+            -- filetypes = { 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
             -- filetypes = { 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'vue', 'css', 'scss', 'html', 'json', 'yaml', 'markdown' },
             extra_args = { '--end-of-line', 'lf' },
           },

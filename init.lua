@@ -203,9 +203,9 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagn
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Window management
-vim.keymap.set('n', '<leader>sv', '<C-w>v')     -- split window vertically
-vim.keymap.set('n', '<leader>sb', '<C-w>s')     -- split window horizontally
-vim.keymap.set('n', '<leader>se', '<C-w>=')     -- make split windows equal width
+vim.keymap.set('n', '<leader>sv', '<C-w>v') -- split window vertically
+vim.keymap.set('n', '<leader>sb', '<C-w>s') -- split window horizontally
+vim.keymap.set('n', '<leader>se', '<C-w>=') -- make split windows equal width
 vim.keymap.set('n', '<leader>sx', ':close<CR>') -- close current split window
 
 -- Explore
@@ -270,14 +270,12 @@ local function setup_autocmds()
       -- vim.api.nvim_set_hl(0, 'TelescopeResultsNormal', { bg = 'NONE', ctermbg = 'NONE' })
       -- vim.api.nvim_set_hl(0, 'TelescopeResultsBorder', { bg = 'NONE', ctermbg = 'NONE' })
 
-
       -- etc...
     end,
   })
 end
 -- Call setup_autocmds function to set up the autocmds
 setup_autocmds()
-
 
 -- Highlight when yanking (copying) text
 --  Try it with `yap` in normal mode
@@ -331,7 +329,7 @@ require('lazy').setup({
   --    require('Comment').setup({})
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',    opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Here is a more advanced example where we pass configuration
   -- options to `gitsigns.nvim`. This is equivalent to the following Lua:
@@ -366,7 +364,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -384,15 +382,15 @@ require('lazy').setup({
       -- }
 
       require('which-key').add {
-        { "<leader>c", group = "[C]ode" },
-        { "<leader>d", group = "[D]ocument" },
-        { "<leader>r", group = "[R]ename" },
-        { "<leader>s", group = "[S]earch" },
-        { "<leader>w", group = "[W]orkspace" },
-        { "<leader>t", group = "[T]oggle" },
-        { "<leader>h", group = "Git [H]unk" },
+        { '<leader>c', group = '[C]ode' },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk' },
         -- Visual mode mapping
-        { "<leader>h", group = "Git [H]unk", mode = "v" },
+        { '<leader>h', group = 'Git [H]unk', mode = 'v' },
       }
       -- -- visual mode
       -- require('which-key').register({
@@ -431,7 +429,7 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { 'nvim-tree/nvim-web-devicons', enabled = vim.g.have_nerd_font },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -704,6 +702,7 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'typescript-language-server',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -781,25 +780,25 @@ require('lazy').setup({
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
-      -- formatters_by_ft = {
-      --   lua = { 'stylua' },
-      --   -- Conform can also run multiple formatters sequentially
-      --   -- python = { "isort", "black" },
-      --   --
-      --   -- You can use a sub-list to tell conform to run *until* a formatter
-      --   -- is found.
-      --   javascript = {
-      --     {
-      --       'prettierd',
-      --       'prettier',
-      --       args = { '--tab-width', '4' }, -- Default to 4 spaces if no .prettierrc is found
-      --     },
-      --   },
-      --   typescript = { 'prettierd', 'prettier' },
-      --   tsx = { 'eslint_d', 'prettierd', 'prettier' },
-      --   jsx = { 'eslint_d', 'prettierd', 'prettier' },
-      --   -- javascript = { { "prettierd", "prettier" } },
-      -- },
+      formatters_by_ft = {
+        lua = { 'stylua' },
+        --   -- Conform can also run multiple formatters sequentially
+        --   -- python = { "isort", "black" },
+        --   --
+        --   -- You can use a sub-list to tell conform to run *until* a formatter
+        --   -- is found.
+        --   javascript = {
+        --     {
+        --       'prettierd',
+        --       'prettier',
+        --       args = { '--tab-width', '4' }, -- Default to 4 spaces if no .prettierrc is found
+        --     },
+        --   },
+        --   typescript = { 'prettierd', 'prettier' },
+        --   tsx = { 'eslint_d', 'prettierd', 'prettier' },
+        --   jsx = { 'eslint_d', 'prettierd', 'prettier' },
+        --   -- javascript = { { "prettierd", "prettier" } },
+      },
     },
   },
 
@@ -973,11 +972,11 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       --  vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'nightfly'
-      require('rose-pine').setup({
+      require('rose-pine').setup {
         disable_background = true,
         disable_float_background = true,
         disable_italics = false, -- optional
-      })
+      }
       vim.cmd.colorscheme 'rose-pine'
       -- vim.cmd.colorscheme 'habamax'
 

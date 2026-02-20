@@ -671,6 +671,12 @@ require('lazy').setup({
         ts_ls = {},
         cssls = {},
         html = {},
+        omnisharp = {
+          -- cmd = { vim.fn.stdpath 'data' .. '/mason/bin/omnisharp' },
+          -- enable_roslyn_analyzers = true,
+          -- organize_imports_on_format = true,
+          -- enable_import_completion = true,
+        },
         --
 
         lua_ls = {
@@ -1039,7 +1045,7 @@ require('lazy').setup({
     build = ':TSUpdate',
     main = 'nvim-treesitter.config',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'css', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'omnisharp', 'css', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {

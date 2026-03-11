@@ -239,14 +239,17 @@ vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper win
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
--- autocmd BufNewFile,BufRead *.cshtml set filetype=html.cshtml.razor
--- autocmd BufNewFile,BufRead *.razor set filetype=html.cshtml.razor
-
--- Define a function to set the filetype for *.cshtml and *.razor files
-
 -- Define a function to attach autocmd events to trigger the set_filetype function
 local function setup_autocmds()
   vim.cmd [[autocmd!]] -- Clear existing autocmds to avoid duplication
+
+  -- vim.filetype.add {
+  --   extension = {
+  --     cshtml = 'razor',
+  --     razor = 'razor',
+  --   },
+  -- }
+  -- vim.treesitter.language.register('html', 'razor')
 
   -- Remove background colors
   vim.api.nvim_create_augroup('nobg', { clear = true })
@@ -527,6 +530,8 @@ require('lazy').setup({
       -- `neodev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
       { 'folke/neodev.nvim', opts = {} },
+      { 'seblyng/roslyn.nvim', opts = {} },
+      -- { 'khoido2003/roslyn-filewatch.nvim', opts = {} }, -- TODO: check this out
     },
     config = function()
       -- Brief aside: **What is LSP?**
@@ -633,10 +638,24 @@ require('lazy').setup({
           -- code, if the language server you are using supports them
           --
           -- This may be unwanted, since they displace some of your code
-          if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
-            map('<leader>th', function()
-              vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
-            end, '[T]oggle Inlay [H]ints')
+          -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          --   map('<leader>th', function()
+          --     vim.lsp.inlay_hint.enable(0, not vim.lsp.inlay_hint.is_enabled())
+          --   end, '[T]oggle Inlay [H]ints')
+          -- end
+          -- if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
+          --   map('<leader>th', function()
+          --     local enabled = vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }
+          --     vim.lsp.inlay_hint.enable(not enabled, { bufnr = event.buf })
+          --   end, '[T]oggle Inlay [H]ints')
+          -- end
+
+          if client and client.name == 'roslyn' and client.server_capabilities.inlayHintProvider then
+            vim.lsp.inlay_hint.enable(true, { bufnr = event.buf })
+            vim.keymap.set('n', '<leader>th', function()
+              local enabled = vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }
+              vim.lsp.inlay_hint.enable(not enabled, { bufnr = event.buf })
+            end, { buffer = event.buf, desc = 'LSP: [T]oggle Inlay [H]ints' })
           end
         end,
       })
@@ -645,6 +664,12 @@ require('lazy').setup({
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
+      -- vim.filetype.add {
+      --   extension = {
+      --     cshtml = 'razor',
+      --     razor = 'razor',
+      --   },
+      -- }
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
@@ -669,15 +694,15 @@ require('lazy').setup({
         --
         -- But for many setups, the LSP (`ts_ls`) will work just fine
         ts_ls = {},
-        cssls = {},
-        html = {},
-        omnisharp = {
-          -- cmd = { vim.fn.stdpath 'data' .. '/mason/bin/omnisharp' },
-          -- enable_roslyn_analyzers = true,
-          -- organize_imports_on_format = true,
-          -- enable_import_completion = true,
-        },
-        --
+        cssls = { filetypes = { 'css', 'scss', 'razor', 'html' } },
+        html = { filetypes = { 'html', 'cshtml', 'razor' } },
+        -- omnisharp = {
+        --   -- cmd = { vim.fn.stdpath 'data' .. '/mason/bin/omnisharp' },
+        --   enable_roslyn_analyzers = true,
+        --   organize_imports_on_format = true,
+        --   enable_decompilation_support = true,
+        --   -- enable_import_completion = true,
+        -- },
 
         lua_ls = {
           -- cmd = {...},
@@ -701,7 +726,45 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu.
-      require('mason').setup()
+      require('mason').setup {
+        registries = {
+          'github:mason-org/mason-registry',
+          'github:Crashdummyy/mason-registry',
+        },
+      }
+      -- vim.filetype.add({
+      --   extension = {
+      --     razor = "razor",
+      --     cshtml = "razor",
+      --   },
+      -- })
+      vim.lsp.config('roslyn', {
+        on_attach = function(client, bufnr)
+          print 'This will run when the serve attaches'
+          -- if client and client.server_capabilities.inlayHintProvider then
+          --   vim.lsp.inlay_hint.enable(true, { bufnr = bufnr })
+          -- end
+        end,
+        settings = {
+          ['csharp|inlay_hints'] = {
+            csharp_enable_inlay_hints_for_implicit_object_creation = true,
+            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+            csharp_enable_inlay_hints_for_lambda_parameter_types = true,
+            csharp_enable_inlay_hints_for_types = true,
+
+            dotnet_enable_inlay_hints_for_parameters = true,
+            dotnet_enable_inlay_hints_for_literal_parameters = true,
+            dotnet_enable_inlay_hints_for_object_creation_parameters = true,
+            dotnet_enable_inlay_hints_for_other_parameters = true,
+            dotnet_organize_imports_on_format = true,
+            -- dotnet_show_completion_items_from_unimported_namespaces = true,
+          },
+        },
+      })
+      -- require('roslyn').setup {
+      --   broad_search = true,
+      --   lock_target = false,
+      -- }
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.
@@ -712,6 +775,9 @@ require('lazy').setup({
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
+      -- require('mason-lspconfig').setup {
+      --   ensure_installed = { 'html', 'cssls', 'lua_ls', 'ts_ls' },
+      -- }
       require('mason-lspconfig').setup {
         handlers = {
           function(server_name)
@@ -725,6 +791,15 @@ require('lazy').setup({
         },
       }
     end,
+  },
+  {
+    'seblyng/roslyn.nvim',
+    ft = { 'cs', 'razor' },
+    opts = {},
+  },
+  {
+    'jlcrochet/vim-razor',
+    ft = { 'razor', 'cshtml' },
   },
   {
     -- 'jose-elias-alvarez/null-ls.nvim',
@@ -777,9 +852,9 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        if vim.bo[bufnr].filetype == 'cshtml.html' then
-          return false
-        end
+        -- if vim.bo[bufnr].filetype == 'cshtml.html' then
+        --   return false
+        -- end
         local disable_filetypes = { c = true, cpp = true }
         return {
           timeout_ms = 500,
@@ -788,6 +863,8 @@ require('lazy').setup({
       end,
       formatters_by_ft = {
         lua = { 'stylua' },
+        cshtml = { 'injected' },
+        razor = { 'injected' },
         --   -- Conform can also run multiple formatters sequentially
         --   -- python = { "isort", "black" },
         --   --
@@ -826,21 +903,30 @@ require('lazy').setup({
         end)(),
         dependencies = {
           -- `friendly-snippets` contains a variety of premade snippets.
-          --    See the README about individual language/framework/plugin snippets:
-          --    https://github.com/rafamadriz/friendly-snippets
-          {
-            'rafamadriz/friendly-snippets',
-            config = function()
-              require('luasnip.loaders.from_vscode').lazy_load()
-            end,
-          },
+          -- See the README about individual language/framework/plugin snippets:
+          -- https://github.com/rafamadriz/friendly-snippets
+          'rafamadriz/friendly-snippets',
+          'lukas-reineke/cmp-rg',
         },
+        config = function()
+          local luasnip = require 'luasnip'
+
+          luasnip.config.setup {}
+
+          -- Let Razor use HTML snippets
+          luasnip.filetype_extend('razor', { 'html' })
+          -- Keep these if you ever need them later:
+          -- luasnip.filetype_extend('cshtml', { 'html' })
+          -- luasnip.filetype_extend('cshtml.html', { 'html' })
+
+          require('luasnip.loaders.from_vscode').lazy_load()
+        end,
       },
       'saadparwaiz1/cmp_luasnip',
 
       -- Adds other completion capabilities.
-      --  nvim-cmp does not ship with all sources by default. They are split
-      --  into multiple repos for maintenance purposes.
+      -- nvim-cmp does not ship with all sources by default. They are split
+      -- into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
       'hrsh7th/cmp-buffer',
@@ -849,7 +935,6 @@ require('lazy').setup({
       -- See `:help cmp`
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
-      luasnip.config.setup {}
 
       cmp.setup {
         snippet = {
@@ -865,79 +950,115 @@ require('lazy').setup({
         --
         -- No, but seriously. Please read `:help ins-completion`, it is really good!
         mapping = cmp.mapping.preset.insert {
-          -- Select the [n]ext item
-          --[[ ['<C-n>'] = cmp.mapping.select_next_item(), ]]
+          -- Select the next item
           ['<C-j>'] = cmp.mapping.select_next_item(),
-          -- Select the [p]revious item
-          --[[ ['<C-p>'] = cmp.mapping.select_prev_item(), ]]
+
+          -- Select the previous item
           ['<C-k>'] = cmp.mapping.select_prev_item(),
 
-          -- Scroll the documentation window [b]ack / [f]orward
+          -- Scroll the documentation window back / forward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
           ['<C-f>'] = cmp.mapping.scroll_docs(4),
-          -- Accept ([y]es) the completion.
-          --  This will auto-import if your LSP supports it.
-          --  This will expand snippets if the LSP sent a snippet.
+
+          -- Accept the completion
           ['<C-y>'] = cmp.mapping.confirm { select = true },
           ['<CR>'] = cmp.mapping.confirm { select = false },
+
           ['<C-e>'] = cmp.mapping.abort(), -- close completion window
 
-          -- Manually trigger a completion from nvim-cmp.
-          --  Generally you don't need this, because nvim-cmp will display
-          --  completions whenever it has completion options available.
-          -- ['<C-Space>'] = cmp.mapping.complete {},
+          -- Show suggestions manually
+          -- ['<C-s>'] = cmp.mapping.complete {},
+          ['<C-s>'] = cmp.mapping(function()
+            local current_ft = vim.bo.filetype
 
-          -- show suggestions without having to type
-          ['<C-s>'] = cmp.mapping.complete {},
+            if current_ft == 'razor' then
+              vim.cmd 'noautocmd setlocal filetype=html'
+              cmp.complete()
+              vim.schedule(function()
+                vim.cmd 'noautocmd setlocal filetype=razor'
+              end)
+            else
+              cmp.complete()
+            end
+          end, { 'i' }),
 
-          -- Think of <c-l> as moving to the right of your snippet expansion.
-          --  So if you have a snippet that's like:
-          --  function $name($args)
-          --    $body
-          --  end
-          --
-          -- <c-l> will move you to the right of each of the expansion locations.
-          -- <c-h> is similar, except moving you backwards.
+          -- Jump forward through snippet placeholders
           ['<C-l>'] = cmp.mapping(function()
             if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
             end
           end, { 'i', 's' }),
+
+          -- Jump backward through snippet placeholders
           ['<C-h>'] = cmp.mapping(function()
             if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
             end
           end, { 'i', 's' }),
-
-          -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
-          --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
-
-          -- FROM MY OTHER CONFIG
-          -- mapping = cmp.mapping.preset.insert({
-          --    ["<C-k>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-          --    ["<C-j>"] = cmp.mapping.select_next_item(), -- next suggestion
-          --    ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-          --    ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          --    ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-          --    ["<C-e>"] = cmp.mapping.abort(), -- close completion window
-          --    ["<CR>"] = cmp.mapping.confirm({ select = false }),
-          --  }),
-          --  -- sources for autocompletion
-          --  sources = cmp.config.sources({
-          --    { name = "nvim_lsp" }, -- lsp
-          --    { name = "luasnip" }, -- snippets
-          --    { name = "buffer" }, -- text within current buffer
-          --    { name = "path" }, -- file system paths
-          --  }),
-          --
         },
         sources = {
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
+          { name = 'buffer' },
+          { name = 'html-css' },
+          { name = 'rg', keyword_lenght = 3 },
         },
       }
     end,
+  },
+  -- {
+  --   'Jezda1337/nvim-html-css',
+  --   dependencies = {
+  --     'nvim-treesitter/nvim-treesitter',
+  --     'nvim-lua/plenary.nvim',
+  --   },
+  --   config = function(_, opts)
+  --     -- Patch the HTML parser to fall back to 'html' for cshtml/razor buffers
+  --     local html_parser = require 'html-css.parsers.html'
+  --     local original_setup = html_parser.setup
+  --     html_parser.setup = function(bufnr)
+  --       local lang = vim.treesitter.language.get_lang(vim.bo[bufnr].filetype)
+  --       if lang ~= 'html' and lang ~= 'tsx' and lang ~= 'javascript' then
+  --         -- temporarily tell treesitter to use html parser just for this parse
+  --         local ok, parser = pcall(vim.treesitter.get_parser, bufnr, 'html')
+  --         if ok then
+  --           -- override the lang so the plugin uses html parser
+  --           html_parser.lang = 'html'
+  --           html_parser.query = html_parser.html
+  --         end
+  --       end
+  --       return original_setup(bufnr)
+  --     end
+  --
+  --     opts = vim.tbl_extend('force', {
+  --       enable_on = { 'html', 'razor', 'cshtml' },
+  --       style_sheets = {
+  --         'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  --       },
+  --       documentation = { auto_show = true },
+  --     }, opts or {})
+  --
+  --     require('html-css').setup(opts)
+  --   end,
+  -- },
+  {
+    'Jezda1337/nvim-html-css',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-lua/plenary.nvim',
+    },
+    opts = {
+      enable_on = { 'html', 'razor', 'cshtml', 'cshtml.html' },
+      documentation = {
+        auto_show = true,
+      },
+
+      -- Load Bootstrap so its classes appear in completion
+      style_sheets = {
+        'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+      },
+    },
   },
 
   -- {
@@ -947,8 +1068,26 @@ require('lazy').setup({
   --     'nvim-lua/plenary.nvim',
   --   },
   --   config = function()
-  --     require('html-css'):setup()
+  --     require('html-css'):setup {
+  --       filetypes = { 'html', 'razor', 'cshtml' },
+  --     }
   --   end,
+  -- },
+  -- {
+  --   'Jezda1337/nvim-html-css',
+  --   dependencies = {
+  --     'nvim-treesitter/nvim-treesitter',
+  --     'nvim-lua/plenary.nvim',
+  --   },
+  --   opts = {
+  --     enable_on = { 'html', 'razor', 'cshtml', 'cshtml.html' },
+  --     documentation = {
+  --       auto_show = true,
+  --     },
+  --     style_sheets = {
+  --       'https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css',
+  --     },
+  --   },
   -- },
 
   { -- You can easily change to a different colorscheme.
@@ -1046,15 +1185,17 @@ require('lazy').setup({
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs',
     opts = {
-      ensure_installed = { 'bash', 'c', 'html', 'css', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'html', 'razor', 'css', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
         enable = true,
+        disable = { 'razor' },
         -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
         --  If you are experiencing weird indenting issues, add the language to
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
+        additional_vim_regex_highlighting = { 'ruby', 'razor' },
+        -- additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
     },
@@ -1091,7 +1232,7 @@ require('lazy').setup({
   require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
   require 'custom.plugins.maximizer',
-  require 'custom.plugins.vim-csharp',
+  -- require 'custom.plugins.vim-csharp',
   require 'custom.plugins.harpoon',
   require 'custom.plugins.trouble',
   -- require 'custom.plugins.vim-razor',

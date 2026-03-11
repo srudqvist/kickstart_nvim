@@ -739,6 +739,10 @@ require('lazy').setup({
       --   },
       -- })
       vim.lsp.config('roslyn', {
+        cmd_env = {
+          DOTNET_ROOT = '/opt/homebrew/opt/dotnet/libexec',
+          PATH = '/opt/homebrew/opt/dotnet/libexec:' .. vim.env.PATH,
+        },
         on_attach = function(client, bufnr)
           print 'This will run when the serve attaches'
           -- if client and client.server_capabilities.inlayHintProvider then

@@ -261,10 +261,23 @@ local function setup_autocmds()
       -- vim.api.nvim_set_hl(0, 'Normal', { bg = 'NONE', ctermbg = 'NONE' })
       -- vim.api.nvim_set_hl(0, 'NeoTreeNormal', { bg = 'NONE', ctermbg = 'NONE' })
       -- vim.api.nvim_set_hl(0, 'NeoTreeNormalNC', { bg = 'NONE', ctermbg = 'NONE' })
-      vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE', ctermbg = 'NONE' })
-      vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE', ctermbg = 'NONE' })
+
+      -- vim.api.nvim_set_hl(0, 'StatusLine', { bg = 'NONE', ctermbg = 'NONE' })
+      -- vim.api.nvim_set_hl(0, 'StatusLineNC', { bg = 'NONE', ctermbg = 'NONE' })
 
       vim.api.nvim_set_hl(0, 'CursorLine', { bg = 'NONE', ctermbg = 'NONE' })
+
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeNormal', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeInsert', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineModeOther', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineFileinfo', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineFilename', { bg = 'NONE' })
+      vim.api.nvim_set_hl(0, 'MiniStatuslineInactive', { bg = 'NONE' })
+
       -- Telescope
       -- vim.api.nvim_set_hl(0, 'TelescopeNormal', { bg = 'NONE', ctermbg = 'NONE' })
       -- vim.api.nvim_set_hl(0, 'TelescopeBorder', { bg = 'NONE', ctermbg = 'NONE' })
@@ -1105,9 +1118,6 @@ require('lazy').setup({
 
     lazy = false,
     -- 'folke/tokyonight.nvim',
-    -- opts = {
-    --   transparent = true,
-    -- },
 
     'rose-pine/neovim',
     -- name = 'rose-pine',
@@ -1121,12 +1131,47 @@ require('lazy').setup({
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       --  vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'nightfly'
+
       require('rose-pine').setup {
+        -- dim_inactive_windows = true,
         disable_background = true,
         disable_float_background = true,
         disable_italics = false, -- optional
+        highlight_groups = {
+          -- Comment = { fg = 'subtle', bg = 'muted' },
+          Normal = { bg = 'none' },
+          NormalNC = { bg = 'none' },
+          Comment = { fg = 'subtle' },
+          LineNr = { fg = 'muted' },
+          CursorLineNr = { fg = 'love' },
+          VertSplit = { fg = 'muted', bg = 'muted' },
+          StatusLine = { fg = 'iris', bg = 'none' },
+          StatusLineNC = { fg = 'pine', bg = 'none' },
+          WinBar = { bg = 'none' },
+          WinBarNC = { bg = 'none' },
+          Visual = { bg = 'iris' },
+          PmenuSel = { bg = 'love' },
+          -- FloatBorder = { fg = 'muted', bg = 'love' },
+          -- NormalFloat = { bg = 'surface' },
+          -- DiagnosticError = { fg = 'love' },
+        },
       }
+
+      -- require('tokyonight').setup {
+      --   style = 'night',
+      --   transparent = true,
+      --   on_highlights = function(hl, c)
+      --     hl.TelescopeNormal = {
+      --       fg = c.fg_dark,
+      --     }
+      --     hl.TelescopeBorder = {
+      --       fg = c.bg_dark,
+      --     }
+      --   end,
+      -- }
+
       vim.cmd.colorscheme 'rose-pine'
+      -- vim.cmd.colorscheme 'tokyonight'
       -- vim.cmd.colorscheme 'habamax'
 
       -- BACKGROUND COLOR STUFF

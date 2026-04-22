@@ -1143,7 +1143,7 @@ require('lazy').setup({
           NormalNC = { bg = 'none' },
           Comment = { fg = 'subtle' },
           LineNr = { fg = 'muted' },
-          CursorLineNr = { fg = 'love' },
+          CursorLineNr = { fg = 'foam' },
           VertSplit = { fg = 'muted', bg = 'muted' },
           StatusLine = { fg = 'iris', bg = 'none' },
           StatusLineNC = { fg = 'pine', bg = 'none' },

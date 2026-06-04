@@ -756,6 +756,7 @@ require('lazy').setup({
           DOTNET_ROOT = '/opt/homebrew/opt/dotnet/libexec',
           PATH = '/opt/homebrew/opt/dotnet/libexec:' .. vim.env.PATH,
         },
+        root_markers = { 'Portal.api.sln', '*.sln', '*.csproj' },
         on_attach = function(client, bufnr)
           print 'This will run when the serve attaches'
           -- if client and client.server_capabilities.inlayHintProvider then
@@ -1143,14 +1144,16 @@ require('lazy').setup({
           NormalNC = { bg = 'none' },
           Comment = { fg = 'subtle' },
           LineNr = { fg = 'muted' },
-          CursorLineNr = { fg = 'foam' },
+          -- CursorLineNr = { fg = 'foam' },
+          CursorLineNr = { fg = '#00a19b' },
           VertSplit = { fg = 'muted', bg = 'muted' },
           StatusLine = { fg = 'iris', bg = 'none' },
           StatusLineNC = { fg = 'pine', bg = 'none' },
           WinBar = { bg = 'none' },
           WinBarNC = { bg = 'none' },
           Visual = { bg = 'iris' },
-          PmenuSel = { bg = 'love' },
+          -- PmenuSel = { bg = 'love' },
+          PmenuSel = { bg = '#00a19b' },
           -- FloatBorder = { fg = 'muted', bg = 'love' },
           -- NormalFloat = { bg = 'surface' },
           -- DiagnosticError = { fg = 'love' },
